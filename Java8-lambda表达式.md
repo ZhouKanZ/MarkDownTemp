@@ -2,7 +2,6 @@
 
 
 ### 介绍
-
  
 本篇文章主要是RxJava官方文档的辅料，里面太多的Lambda表达式，没有一些了解的确难以看懂，因为是主要的重心还是落在RxJava上，所以本文概述一下如何在Android Studio中使用以及各个表达式的意思，还有与Rxjava及其相似的stream。[官方文档](http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html#)如何描述Lambda表达式：
 
@@ -247,6 +246,129 @@
 	- 每个方法都重复循环
 * 需要大量方法来实现每个用例
 * 上述代码不灵活，如果招聘条件发生变化，那么将引起大量的更改，可维护性不强
+
+
+>4.第一次重构
+	
+ 这次我们将上述的几个问题列入考虑，其实，我感觉我的翻译貌似出了点小差错，或者是我没明白他是什么意思，除了最后一项可以理解之外，其他的情况没弄懂是什么意思，再或者是本身语言的限制只能优化最后一项，那么下面看看，该如何重构。
+
+	代码块 ： 先空着
+
+ 搜索条件被封装进方法中，较之前的代码而言确实有一定的提升，条件可以被反复利用并且可以更方便的更改。但是，还是有很多重复的地方，是不是没有更好的办法呢？（······肯定是有的，要不我说个球）
+
+ 在使用lambda之前先看看还有什么能改进的或者是为lambda做一些铺垫。上述的代码，其实并不符合开闭原则（OCP -- 原则上对修改关闭，对扩展开放），这段程序可能发生改变是招聘条件，那么我们让调用程序自己去维护，就更进一步的优化了。
+ 
+ 将条件抽象成接口，让调用者自己去维护，接口如下：
+ 
+	 public interface Predicate<T> {
+	   public boolean test(T t);
+	 }
+
+ RoboContactsLambda.java
+
+
+  	package com.example.lambda;
+  	import java.util.List;
+  	import java.util.function.Predicate;
+
+    /**
+     * @author MikeW
+     */
+    public class RoboContactLambda {
+        public void phoneContacts(List<Person> pl, Predicate<Person> pred) {
+            for (Person p : pl) {
+                if (pred.test(p)) {
+                    roboCall(p);
+                }
+            }
+        }
+
+        public void emailContacts(List<Person> pl, Predicate<Person> pred) {
+            for (Person p : pl) {
+                if (pred.test(p)) {
+                    roboEmail(p);
+                }
+            }
+        }
+
+        public void mailContacts(List<Person> pl, Predicate<Person> pred) {
+            for (Person p : pl) {
+                if (pred.test(p)) {
+                    roboMail(p);
+                }
+            }
+        }
+
+        public void roboCall(Person p) {
+            System.out.println("Calling " + p.getGivenName() + " " + p.getSurName() + " age " + p.getAge() + " at " + p.getPhone());
+        }
+
+        public void roboEmail(Person p) {
+            System.out.println("EMailing " + p.getGivenName() + " " + p.getSurName() + " age " + p.getAge() + " at " + p.getEmail());
+        }
+
+        public void roboMail(Person p) {
+            System.out.println("Mailing " + p.getGivenName() + " " + p.getSurName() + " age " + p.getAge() + " at " + p.getAddress());
+        }
+    }
+ 
+  
+
+// todo 相关的解释
+
+## The java.util.function 包
+
+
+ function包提供了几种方便去使用lambda的interface，当然不仅仅是给lambda表达式使用，所有诸如上述的优化都是可以考虑用这些方法的，确实我看到这里就有点抑制不住内心的小狂喜，lambda的这些function不就是Rxjava中常用的操作符嘛，这么麻烦的工作算是没白做，就下面的需求，我们来体验一下她的魅力。
+
+* Predicate: A property of the object passed as argument
+* Consumer: An action to be performed with the object passed as argument
+* Function: Transform a T to a U
+* Supplier: Provide an instance of a T (such as a factory)
+* UnaryOperator: A unary operator from T -> T
+* BinaryOperator: A binary operator from (T, T) -> T
+
+
+> 输出东方人和西方人的信息
+ 
+  上面的personList（求职者），要将他们的信息分别发给，老板和老板娘，他们一个是中国人，一个是美国人；由于习惯不同，西方习惯姓在后名在前（分别对应Given name 和 surname），中国的习惯我就不提了。
+
+#### 传统的方式
+
+#### 使用Function Interface的方式
+
+#### 输出
+
+
+## lambda表达式和集合
+
+ 体验过Function接口的优点还没完，java 8给我们的惊喜还不止这些。（不这些都不够，我必须是你近旁的一只木棉，根紧握地里，也相触云间 ... 神特么的乱入），lambda基础部分结束后，来看看在集合方面它又有哪些优势。
+
+> 1.添加新的类，将查询条件全部封装进HashMap中
+> 2.Looping
+> 3.链式调用和过滤器
+> 4.getting Lazy
+
+#### stream
+ 
+ 
+
+
+## 结语
+
+
+
+ 
+
+
+
+
+
+
+	
+
+
+
 
 
 
